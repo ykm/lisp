@@ -1,15 +1,14 @@
 
 (defmacro defcurry (name parms &body body)
-"Define a currying function. Uses the same syntax as DEFUN, except that
-the PARMS must be symbols. Any partial application of NAME will result
-in a function that is able to take in the future applications and
-eventually return a result. Inspired by the currying capability of
-ML."
-
-(when (or (not (every #'symbolp parms))
-          (find 'cl:&rest parms) (find 'cl:&key parms))
-  (error "Lambda list for (DEFCURRY ~a ...) should contain no special
-directives (&REST, &KEY) and no sublists." name))
+  "Define a currying function. Uses the same syntax as DEFUN, except that
+  the PARMS must be symbols. Any partial application of NAME will result
+  in a function that is able to take in the future applications and
+  eventually return a result. Inspired by the currying capability of
+  ML."
+  (when (or (not (every #'symbolp parms))
+	    (find 'cl:&rest parms) (find 'cl:&key parms))
+    (error "Lambda list for (DEFCURRY ~a ...) should contain no special
+	directives (&REST, &KEY) and no sublists." name))
 
 (with-gensyms (curry-parms curry-lambda)
   `(progn (defun ,name (&rest ,curry-parms)

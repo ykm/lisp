@@ -1,3 +1,5 @@
+(ql:quickload 'cl-ppcre)
+
 (defun primep(num)
   (when (oddp num)
     (loop for i from 3 to (1+ (isqrt num)) by 2
@@ -136,7 +138,12 @@
 (defun relative-primes(val)
   (loop for i from 1 to val 
      when (equal 1 (gcd i val))
-     counting i))
+     collect i))
+
+(defmacro with-relative-primes((n var) &body body)
+  `(loop for ,var from ,n downto 1 
+      when (eq (gcd ,var ,n) 1)
+      do ,@body))
 
 (defun totient-ratio(num)
   (/ num (relative-primes num)))
@@ -151,3 +158,47 @@
 	    (setq val i)
 	    (setq tmp ratio)))
     (values val tmp)))
+
+(defun permutations(lst)
+  (cond 
+    ((null lst) nil)
+    ((null (cdr lst)) (list lst))
+    (t (loop for element in lst
+	  append (mapcar #'(lambda(v) (cons element v))
+			 (permutations (remove element lst)))))))
+
+(defun read-matrix(filename)
+  (with-open-file (file filename)
+    (loop for line = (read-line file nil) 
+       while line 
+       collect (mapcar #'parse-integer (cl-ppcre:split "," line)))))
+
+(defun maximum(lst)
+  (cond
+    ((null lst) (error "maximum on a empty list"))
+    ((null (rest lst)) (car lst))
+    (T (let ((val (maximum (rest lst))))
+	 (if (> (first lst) val)
+	     (first lst)
+	     val)))))
+
+(defmacro doprimes((var start condition) &body body)
+  `(labels ((is-prime(val)
+	      (loop for i from 2 to (isqrt val) 
+		 never (zerop (mod val i)))))
+     (loop for ,var from ,start while ,condition when (is-prime ,var) do
+	  ,@body)))
+
+(defun spiral-diagonal(side)
+  (let ((start 1))
+    (loop for i from 2 to (1- side) by 2 
+       append (loop for j from 1 to 4 
+		 collect (incf start i)))))
+
+(defun spiral-prime-ratio(ratio)
+  "pe-58 solution"
+  (loop for i from 9 by 2
+     for diagonal = (spiral-diagonal i)
+     for prime-count = (count-if #'primep diagonal)
+     when (< (/ prime-count (length diagonal)) ratio)
+     do (return i)))

@@ -1,5 +1,5 @@
-(load "~/code/lisp/l99.lisp")
-(load "~/code/lisp/utilities.lisp")
+(load "~/code/lisp/lisp/l99.lisp")
+(load "~/code/lisp/lisp/utilities.lisp")
 
 (defun look-and-say(num)
   (loop for i in (runlength-encode (digits num))
