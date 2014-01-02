@@ -202,3 +202,10 @@
      for prime-count = (count-if #'primep diagonal)
      when (< (/ prime-count (length diagonal)) ratio)
      do (return i)))
+
+(defmacro with-triangle-numbers((var &optional (end -1)) &body body)
+  `(let ((num (gensym)))
+     (loop for num from 1
+	for ,var = 1 then (+ ,var num)
+	while (or (< ,var ,end) (eq ,end -1))
+	do ,@body)))
